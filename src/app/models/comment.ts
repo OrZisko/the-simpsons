@@ -3,8 +3,8 @@ export interface Comment {
   parentCommentId: number | null;
   children: number[];
   ownerId: number;
-  ownerName?: string;
+  ownerName: string;
   txt: string;
-  createdAt?: number;
+  createdAt: number;
   deletedAt: number | null;
 }

@@ -10,10 +10,10 @@ import { UsersService } from 'src/app/service/users-service.service';
   styleUrls: ['./app-home.component.scss'],
 })
 export class AppHomeComponent implements OnInit, OnDestroy {
-  mainComments: Comment[];
-  comments: Comment[];
-  comments$: Observable<Comment[]>;
   commentsSub: Subscription;
+  comments$: Observable<Comment[]>;
+
+  mainComments: number[];
   focusedCommentId: number | null = null;
 
   constructor(
@@ -25,17 +25,17 @@ export class AppHomeComponent implements OnInit, OnDestroy {
     this.userService.init();
     this.commentsService.init();
     this.commentsSub = this.commentsService.comments$.subscribe((comments) => {
-      this.mainComments = comments.filter(
-        (comment) => !comment.parentCommentId
-      );
+      this.mainComments = comments
+        .filter((comment) => !comment.parentCommentId)
+        .map((comment) => comment.id);
     });
   }
 
-  onCommentFocus(commentId) {
+  onCommentFocus(commentId: number) {
     this.focusedCommentId = commentId ? commentId : null;
   }
 
-  onAddComment(commentTxt) {
+  onAddComment(commentTxt: string) {
     const comment = {
       parentCommentId: this.focusedCommentId,
       ownerId: this.userService.currUserId,

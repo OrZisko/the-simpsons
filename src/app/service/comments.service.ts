@@ -20,18 +20,22 @@ export class CommentsService {
 
   public init(): void {
     let commetsJson = localStorage.getItem(COMMENT_KEY);
-    let comments = commetsJson
-      ? JSON.parse(commetsJson)
-      : require('../../assets/data/comments.json');
-    comments = this._aggregateComments(comments);
-    this._setComments(comments);
+    let comments: Comment[];
+    if (commetsJson) {
+      comments = JSON.parse(commetsJson);
+    } else {
+      comments = require('../../assets/data/comments.json');
+      comments = this._aggregateComments(comments);
+    }
+    this._commantsDB = this._aggregateComments(comments);
+    this._setComments(this._commantsDB);
   }
 
   public getCommentsById(ids: number[]): Comment[] {
     return ids.map((id) => this.getById(id));
   }
 
-  public getById(id) {
+  public getById(id: number) {
     return this._commantsDB.find((comment) => comment.id === id);
   }
 
@@ -53,27 +57,37 @@ export class CommentsService {
     this._setComments(this._commantsDB);
   }
 
-  public updateComment(comment) {
+  public updateComment(id: number, txt: string) {
     const idx = this._commantsDB.findIndex(
-      (currComment) => currComment.id === comment.id
+      (currComment) => currComment.id === id
     );
     this._commantsDB[idx] = {
-      ...comment,
+      ...this._commantsDB[idx],
+      txt: txt,
       createdAt: Date.now(),
     };
     this._setComments(this._commantsDB);
   }
 
-  public deleteComment(commentId) {
+  public deleteComment(commentId: number) {
     const idx = this._commantsDB.findIndex(
       (comment) => comment.id === commentId
     );
-    this._commantsDB[idx].deletedAt = Date.now();
+    const comment = this._commantsDB[idx];
+    comment.deletedAt = Date.now();
+    if (comment.parentCommentId) {
+      const parentComment = this._commantsDB.find(
+        (currComment) => currComment.id === comment.parentCommentId
+      );
+      parentComment.children = parentComment.children.filter(
+        (childId) => childId !== commentId
+      );
+    }
     this._commantsDB.splice(idx, 1);
     this._setComments(this._commantsDB);
   }
 
-  private _aggregateComments(comments): Comment[] {
+  private _aggregateComments(comments: Comment[]): Comment[] {
     comments = comments.filter((comment) => !comment.deletedAt);
     comments = comments.map((comment) => {
       const user = this.userService.getUserById(comment.ownerId);
@@ -92,8 +106,7 @@ export class CommentsService {
     return comments;
   }
 
-  private _setComments(comments) {
-    this._commantsDB = [...comments];
+  private _setComments(comments: Comment[]) {
     localStorage.setItem(COMMENT_KEY, JSON.stringify(comments));
     this._comments$.next(comments);
   }

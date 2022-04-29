@@ -1,14 +1,14 @@
+import { OnDestroy } from '@angular/core';
 import {
   Component,
   ElementRef,
   EventEmitter,
   Input,
-  OnChanges,
   OnInit,
   Output,
-  SimpleChanges,
   ViewChild,
 } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { Comment } from 'src/app/models/comment';
 import { CommentsService } from 'src/app/service/comments.service';
 import { UsersService } from 'src/app/service/users-service.service';
@@ -18,16 +18,15 @@ import { UsersService } from 'src/app/service/users-service.service';
   templateUrl: './comment.component.html',
   styleUrls: ['./comment.component.scss'],
 })
-export class CommentComponent implements OnInit, OnChanges {
-  @Input() comment: Comment;
-  @Input() children: number[];
+export class CommentComponent implements OnInit, OnDestroy {
+  @Input() commentId: number;
   @Output() onCommentFocus = new EventEmitter<number>();
   @ViewChild('txt') elTxt: ElementRef;
 
-  commentToShow: Comment;
-  childComments: Comment[];
-  isByCurrUser: boolean;
+  commentsSub: Subscription;
+  comment: Comment;
 
+  isByCurrUser: boolean;
   isChildCommentsOpen = false;
   isEditable = false;
 
@@ -37,38 +36,36 @@ export class CommentComponent implements OnInit, OnChanges {
   ) {}
 
   ngOnInit() {
-    this.commentToShow = { ...this.comment };
-    this.isByCurrUser = this.comment.ownerId === this.userService.currUserId;
+    this.commentsSub = this.commentService.comments$.subscribe((comments) => {
+      this.comment = comments.find(
+        (currComment) => currComment.id === this.commentId
+      );
+      if (this.comment.ownerId === this.userService.currUserId)
+        this.isByCurrUser = true;
+    });
+  }
+  ngOnDestroy() {
+    this.commentsSub.unsubscribe();
   }
 
-  ngOnChanges(changes): void {
-    if (changes.children.currentValue !== changes.children.previousValue) {
-      this.childComments = this.commentService.getCommentsById(
-        this.comment.children
-      );
-    }
+  onUpdate() {
+    const txt = this.elTxt.nativeElement.innerText;
+    this.commentService.updateComment(this.commentId, txt);
+    this.onToggleIsEditable();
+  }
+  onDelete() {
+    this.commentService.deleteComment(this.commentId);
+  }
+
+  commentFocus(e) {
+    e.stopPropagation();
+    this.onCommentFocus.emit(this.commentId);
   }
 
   onToggleChildComments() {
     this.isChildCommentsOpen = !this.isChildCommentsOpen;
   }
-
   onToggleIsEditable() {
     this.isEditable = !this.isEditable;
-  }
-
-  commentFocus(e) {
-    e.stopPropagation();
-    this.onCommentFocus.emit(this.comment.id);
-  }
-
-  onDelete() {
-    this.commentService.deleteComment(this.comment.id);
-  }
-
-  onUpdate() {
-    this.commentToShow.txt = this.elTxt.nativeElement.innerText;
-    this.commentService.updateComment(this.commentToShow);
-    this.onToggleIsEditable();
   }
 }

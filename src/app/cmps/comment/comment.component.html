@@ -3,15 +3,15 @@
         <div class="img-container">
             <img src="../../../assets/users/{{comment.ownerId}}.jpg" alt="">
         </div>
-        <div class="comment-info txt-area">
+        <div class="comment-info">
             <h5>{{comment.ownerName}}</h5>
             <h5>{{comment.createdAt | timeDesc}}</h5>
         </div>
-        <div class="comment-txt txt-area">
+        <div class="comment-txt">
             <p #txt contentEditable="{{isEditable}}">{{comment.txt}}</p>
         </div>
         <div class="btn-container">
-            <button class="link-btn" (click)="onToggleChildComments()" *ngIf="childComments.length">
+            <button class="link-btn" (click)="onToggleChildComments()" *ngIf="comment.children.length">
                 {{isChildCommentsOpen ? 'Hide comments' : 'Show comments'}}
             </button>
         </div>
@@ -22,6 +22,6 @@
         </div>
     </div>
     <ul class="child-comments-list" *ngIf="isChildCommentsOpen">
-        <comments-list [comments]="childComments" (onCommentFocus)="onCommentFocus.emit($event)"></comments-list>
+        <comments-list [comments]="comment.children" (onCommentFocus)="onCommentFocus.emit($event)"></comments-list>
     </ul>
 </article>

@@ -10,16 +10,15 @@
     margin-left: 25px;
 
     .comment-info {
+        display: flex;
         flex-direction: column;
         justify-content: center;
         text-align: left;
         margin-left: 50px;
     }
     .comment-txt {
-        align-items: center;
-    }
-    .txt-area {
         display: flex;
+        align-items: center;
     }
     .btn-container {
         button {
