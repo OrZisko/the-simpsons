@@ -1,0 +1,8 @@
+<div class="comment-input" (click)="prevent($event)">
+    <div class="img-container">
+        <img src="../../../assets/users/{{currUserId}}.jpg" alt="">
+    </div>
+    <textarea [(ngModel)]="commentTxt" placeholder="Please add your comment here" name="commentTxt" cols="100"
+        rows="2"></textarea>
+    <button class="btn" (click)="onAddComment.emit(commentTxt)">SUBMIT</button>
+</div>

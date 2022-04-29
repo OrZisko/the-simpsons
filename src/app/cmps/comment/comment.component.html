@@ -1,0 +1,27 @@
+<article class="comment">
+    <div class="comment-container" (click)="commentFocus($event)">
+        <div class="img-container">
+            <img src="../../../assets/users/{{comment.ownerId}}.jpg" alt="">
+        </div>
+        <div class="comment-info txt-area">
+            <h5>{{comment.ownerName}}</h5>
+            <h5>{{comment.createdAt | timeDesc}}</h5>
+        </div>
+        <div class="comment-txt txt-area">
+            <p #txt contentEditable="{{isEditable}}">{{comment.txt}}</p>
+        </div>
+        <div class="btn-container">
+            <button class="link-btn" (click)="onToggleChildComments()" *ngIf="childComments.length">
+                {{isChildCommentsOpen ? 'Hide comments' : 'Show comments'}}
+            </button>
+        </div>
+        <div class="edit-btns-container" *ngIf="isByCurrUser">
+            <button class="btn" (click)="onDelete()">DELETE</button>
+            <button *ngIf="!isEditable" class="btn" (click)="onToggleIsEditable()">EDIT</button>
+            <button *ngIf="isEditable" class="btn" (click)="onUpdate()">SAVE</button>
+        </div>
+    </div>
+    <ul class="child-comments-list" *ngIf="isChildCommentsOpen">
+        <comments-list [comments]="childComments" (onCommentFocus)="onCommentFocus.emit($event)"></comments-list>
+    </ul>
+</article>

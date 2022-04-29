@@ -1,0 +1,45 @@
+.comment-container {
+    display: grid;
+    grid-template-columns: auto 1fr 2fr 0px;
+    grid-template-rows: 1fr 0px;
+    border: 1px solid rgba(128, 128, 128, 0.619);
+    box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.197);
+    background-color: white;
+    padding: 5px;
+    margin: 20px;
+    margin-left: 25px;
+
+    .comment-info {
+        flex-direction: column;
+        justify-content: center;
+        text-align: left;
+        margin-left: 50px;
+    }
+    .comment-txt {
+        align-items: center;
+    }
+    .txt-area {
+        display: flex;
+    }
+    .btn-container {
+        button {
+            color: hsl(209, 94%, 50%);
+        }
+        grid-column: 3;
+        position: relative;
+        z-index: 3;
+        bottom: 20px;
+        display: flex;
+        justify-content: end;
+    }
+    .edit-btns-container {
+        position: relative;
+        display: flex;
+        direction: rtl;
+        z-index: 2;
+        width: 300px;
+        left: -300px;
+        grid-column: 4;
+        grid-row: 1/-1;
+    }
+}

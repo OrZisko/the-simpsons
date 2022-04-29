@@ -1,0 +1,13 @@
+.link-btn {
+    background: none;
+    border: none;
+    &:hover {
+        text-decoration: underline;
+    }
+}
+.img-container img {
+    object-fit: cover;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+}
