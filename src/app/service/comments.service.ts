@@ -27,7 +27,6 @@ export class CommentsService {
       comments = JSON.parse(commetsJson);
     } else {
       comments = require('../../assets/data/comments.json');
-      comments = this._aggregateComments(comments);
     }
     this._commantsDB = this._aggregateComments(comments);
     this._setComments(this._commantsDB);
@@ -77,12 +76,14 @@ export class CommentsService {
     const commentToDelete = this._commantsDB[idx];
     commentToDelete.deletedAt = Date.now();
     if (commentToDelete.parentCommentId) {
-      const parentComment = this._commantsDB.find(
+      const parentIdx = this._commantsDB.findIndex(
         (currComment) => currComment.id === commentToDelete.parentCommentId
       );
+      const parentComment = this._commantsDB[parentIdx];
       parentComment.children = parentComment.children.filter(
         (childId) => childId !== commentId
       );
+      this._commantsDB.splice(parentIdx, 1, parentComment);
     }
     commentToDelete.children.forEach((childId) => this.deleteComment(childId));
     this._setComments(this._commantsDB);
@@ -95,7 +96,11 @@ export class CommentsService {
         ...comment,
         ownerName: user.displayName,
         children: comments
-          .filter((currCommnet) => currCommnet.parentCommentId === comment.id)
+          .filter(
+            (currCommnet) =>
+              currCommnet.parentCommentId === comment.id &&
+              !currCommnet.deletedAt
+          )
           .map((currComment) => currComment.id),
         createdAt:
           typeof comment.createdAt === 'number'

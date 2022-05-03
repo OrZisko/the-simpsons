@@ -1,4 +1,4 @@
-<article class="comment">
+<article class="comment" *ngIf="comment">
     <div class="comment-container" [class.focus]="isFocused" (click)="commentFocus($event)">
         <div class="img-container">
             <img src="../../../assets/users/{{comment.ownerId}}.jpg" alt="">
