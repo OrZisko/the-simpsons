@@ -1,5 +1,5 @@
 <article class="comment">
-    <div class="comment-container" (click)="commentFocus($event)">
+    <div class="comment-container" [class.focus]="isFocused" (click)="commentFocus($event)">
         <div class="img-container">
             <img src="../../../assets/users/{{comment.ownerId}}.jpg" alt="">
         </div>
@@ -16,12 +16,13 @@
             </button>
         </div>
         <div class="edit-btns-container" *ngIf="isByCurrUser">
-            <button class="btn" (click)="onDelete()">DELETE</button>
-            <button *ngIf="!isEditable" class="btn" (click)="onToggleIsEditable()">EDIT</button>
-            <button *ngIf="isEditable" class="btn" (click)="onUpdate()">SAVE</button>
+            <button class="btn" (click)="onDelete($event)">DELETE</button>
+            <button *ngIf="!isEditable" class="btn" (click)="onToggleIsEditable($event)">EDIT</button>
+            <button *ngIf="isEditable" class="btn" (click)="onUpdate($event)">SAVE</button>
         </div>
     </div>
     <ul class="child-comments-list" *ngIf="isChildCommentsOpen">
-        <comments-list [comments]="comment.children" (onCommentFocus)="onCommentFocus.emit($event)"></comments-list>
+        <comments-list [focusedCommentId]="focusedCommentId" [comments]="comment.children"
+            (onCommentFocus)="onCommentFocus.emit($event)"></comments-list>
     </ul>
 </article>

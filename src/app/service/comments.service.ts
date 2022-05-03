@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, map } from 'rxjs';
 import { Comment } from '../models/comment';
 import { UsersService } from './users-service.service';
 
@@ -16,7 +16,9 @@ export class CommentsService {
   private _commantsDB: Comment[];
 
   private _comments$ = new BehaviorSubject<Comment[]>([]);
-  public comments$ = this._comments$.asObservable();
+  public comments$ = this._comments$
+    .asObservable()
+    .pipe(map((comments) => comments.filter((comment) => !comment.deletedAt)));
 
   public init(): void {
     let commetsJson = localStorage.getItem(COMMENT_KEY);
@@ -73,22 +75,21 @@ export class CommentsService {
     const idx = this._commantsDB.findIndex(
       (comment) => comment.id === commentId
     );
-    const comment = this._commantsDB[idx];
-    comment.deletedAt = Date.now();
-    if (comment.parentCommentId) {
+    const commentToDelete = this._commantsDB[idx];
+    commentToDelete.deletedAt = Date.now();
+    if (commentToDelete.parentCommentId) {
       const parentComment = this._commantsDB.find(
-        (currComment) => currComment.id === comment.parentCommentId
+        (currComment) => currComment.id === commentToDelete.parentCommentId
       );
       parentComment.children = parentComment.children.filter(
         (childId) => childId !== commentId
       );
     }
-    this._commantsDB.splice(idx, 1);
+    commentToDelete.children.forEach((childId) => this.deleteComment(childId));
     this._setComments(this._commantsDB);
   }
 
   private _aggregateComments(comments: Comment[]): Comment[] {
-    comments = comments.filter((comment) => !comment.deletedAt);
     comments = comments.map((comment) => {
       const user = this.userService.getUserById(comment.ownerId);
       return {

@@ -1,4 +1,4 @@
-import { OnDestroy } from '@angular/core';
+import { OnChanges, OnDestroy, SimpleChanges } from '@angular/core';
 import {
   Component,
   ElementRef,
@@ -18,17 +18,20 @@ import { UsersService } from 'src/app/service/users-service.service';
   templateUrl: './comment.component.html',
   styleUrls: ['./comment.component.scss'],
 })
-export class CommentComponent implements OnInit, OnDestroy {
+export class CommentComponent implements OnInit, OnDestroy, OnChanges {
   @Input() commentId: number;
+  @Input() focusedCommentId: number | null;
   @Output() onCommentFocus = new EventEmitter<number>();
   @ViewChild('txt') elTxt: ElementRef;
 
   commentsSub: Subscription;
+  userUsb: Subscription;
   comment: Comment;
 
   isByCurrUser: boolean;
   isChildCommentsOpen = false;
   isEditable = false;
+  isFocused = false;
 
   constructor(
     private commentService: CommentsService,
@@ -40,24 +43,32 @@ export class CommentComponent implements OnInit, OnDestroy {
       this.comment = comments.find(
         (currComment) => currComment.id === this.commentId
       );
-      if (this.comment.ownerId === this.userService.currUserId)
-        this.isByCurrUser = true;
+    });
+    this.userUsb = this.userService.currUser$.subscribe((user) => {
+      this.isByCurrUser = this.comment.ownerId === user.id ? true : false;
     });
   }
   ngOnDestroy() {
     this.commentsSub.unsubscribe();
+    this.userUsb.unsubscribe();
+  }
+  ngOnChanges(changes: SimpleChanges): void {
+    this.isFocused =
+      changes['focusedCommentId'].currentValue === this.commentId;
   }
 
-  onUpdate() {
+  onUpdate(ev: Event) {
+    ev.stopPropagation();
     const txt = this.elTxt.nativeElement.innerText;
     this.commentService.updateComment(this.commentId, txt);
-    this.onToggleIsEditable();
+    this.onToggleIsEditable(null);
   }
-  onDelete() {
+  onDelete(ev: Event) {
+    ev.stopPropagation();
     this.commentService.deleteComment(this.commentId);
   }
 
-  commentFocus(e) {
+  commentFocus(e: Event) {
     e.stopPropagation();
     this.onCommentFocus.emit(this.commentId);
   }
@@ -65,7 +76,11 @@ export class CommentComponent implements OnInit, OnDestroy {
   onToggleChildComments() {
     this.isChildCommentsOpen = !this.isChildCommentsOpen;
   }
-  onToggleIsEditable() {
+  onToggleIsEditable(ev: Event) {
+    if (ev) ev.stopPropagation();
     this.isEditable = !this.isEditable;
+    this.isEditable
+      ? this.elTxt.nativeElement.classList.add('focus')
+      : this.elTxt.nativeElement.classList.remove('focus');
   }
 }

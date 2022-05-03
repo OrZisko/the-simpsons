@@ -1,0 +1,8 @@
+<div class="user-portal">
+    <h1 class="greeting">Hello <span>{{currUser.displayName}}</span></h1>
+    <label>Change user:
+        <select name="user" [ngModel]="currUser.id" (ngModelChange)=onChangeUser($event)>
+            <option *ngFor="let user of users" value={{user.id}}>{{user.displayName}}</option>
+        </select>
+    </label>
+</div>

@@ -12,8 +12,11 @@ const USER_KEY = 'appUsers';
 export class UsersService {
   constructor() {}
 
-  private users: User[];
-  public currUserId = 3;
+  private _users$ = new BehaviorSubject<User[]>([]);
+  public users$ = this._users$.asObservable();
+
+  private _currUser$ = new BehaviorSubject<User>(null);
+  public currUser$ = this._currUser$.asObservable();
 
   public init(): void {
     let usersJson = localStorage.getItem(USER_KEY);
@@ -21,10 +24,16 @@ export class UsersService {
       ? JSON.parse(usersJson)
       : require('../../assets/data/users.json');
     localStorage.setItem(USER_KEY, JSON.stringify(users));
-    this.users = users;
+    this._users$.next(users);
+    this._currUser$.next(users[0]);
   }
 
   public getUserById(id: number): User {
-    return this.users.find((user) => user.id === id);
+    return this._users$.getValue().find((user) => user.id === id);
+  }
+
+  public changeUser(userId: number) {
+    const user = this.getUserById(userId);
+    this._currUser$.next(user);
   }
 }

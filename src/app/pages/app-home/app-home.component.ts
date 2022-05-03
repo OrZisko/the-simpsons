@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
 import { Comment } from 'src/app/models/comment';
+import { User } from 'src/app/models/user';
 import { CommentsService } from 'src/app/service/comments.service';
 import { UsersService } from 'src/app/service/users-service.service';
 
@@ -10,6 +11,9 @@ import { UsersService } from 'src/app/service/users-service.service';
   styleUrls: ['./app-home.component.scss'],
 })
 export class AppHomeComponent implements OnInit, OnDestroy {
+  currUserSub: Subscription;
+  currUser: User;
+
   commentsSub: Subscription;
   comments$: Observable<Comment[]>;
 
@@ -29,6 +33,9 @@ export class AppHomeComponent implements OnInit, OnDestroy {
         .filter((comment) => !comment.parentCommentId)
         .map((comment) => comment.id);
     });
+    this.currUserSub = this.userService.currUser$.subscribe((user) => {
+      this.currUser = user;
+    });
   }
 
   onCommentFocus(commentId: number) {
@@ -38,7 +45,7 @@ export class AppHomeComponent implements OnInit, OnDestroy {
   onAddComment(commentTxt: string) {
     const comment = {
       parentCommentId: this.focusedCommentId,
-      ownerId: this.userService.currUserId,
+      ownerId: this.currUser.id,
       txt: commentTxt,
       deletedAt: null,
     };
@@ -47,5 +54,6 @@ export class AppHomeComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.commentsSub.unsubscribe();
+    this.currUserSub.unsubscribe();
   }
 }

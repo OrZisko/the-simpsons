@@ -1,4 +1,11 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  OnDestroy,
+  OnInit,
+  Output,
+} from '@angular/core';
+import { Subscription } from 'rxjs';
 import { UsersService } from 'src/app/service/users-service.service';
 
 @Component({
@@ -6,18 +13,29 @@ import { UsersService } from 'src/app/service/users-service.service';
   templateUrl: './comment-input.component.html',
   styleUrls: ['./comment-input.component.scss'],
 })
-export class CommentInputComponent implements OnInit {
+export class CommentInputComponent implements OnInit, OnDestroy {
   @Output() onAddComment = new EventEmitter<string>();
+  userSub: Subscription;
+  currUserId: number;
 
   constructor(private userService: UsersService) {}
 
-  currUserId: number;
   commentTxt = '';
 
   ngOnInit(): void {
-    this.currUserId = this.userService.currUserId;
+    this.userSub = this.userService.currUser$.subscribe((user) => {
+      this.currUserId = user.id;
+    });
   }
-  prevent(e) {
+  ngOnDestroy(): void {
+    this.userSub.unsubscribe();
+  }
+
+  addComment() {
+    this.onAddComment.emit(this.commentTxt);
+    this.commentTxt = '';
+  }
+  prevent(e: Event) {
     e.stopPropagation();
   }
 }

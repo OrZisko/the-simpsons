@@ -1,4 +1,6 @@
 <div class="app-home" (click)="onCommentFocus(null)">
-    <comments-list [comments]="mainComments" (onCommentFocus)="onCommentFocus($event)"></comments-list>
+    <comments-list [focusedCommentId]="focusedCommentId" [comments]="mainComments"
+        (onCommentFocus)="onCommentFocus($event)">
+    </comments-list>
     <comment-input (onAddComment)="onAddComment($event)"></comment-input>
 </div>

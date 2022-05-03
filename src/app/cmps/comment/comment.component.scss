@@ -1,4 +1,8 @@
 .comment-container {
+    &.focus,
+    .focus {
+        border: 4px solid gray;
+    }
     display: grid;
     grid-template-columns: auto 1fr 2fr 0px;
     grid-template-rows: 1fr 0px;

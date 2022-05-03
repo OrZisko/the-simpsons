@@ -1,4 +1,5 @@
 <div class="comments-list">
-    <comment *ngFor="let commentId of comments" [commentId]="commentId" (onCommentFocus)="onCommentFocus.emit($event)">
+    <comment *ngFor="let commentId of comments" [focusedCommentId]="focusedCommentId" [commentId]="commentId"
+        (onCommentFocus)="onCommentFocus.emit($event)">
     </comment>
 </div>

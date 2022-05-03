@@ -8,6 +8,7 @@ import { CommentInputComponent } from './cmps/comment-input/comment-input.compon
 import { FormsModule } from '@angular/forms';
 import { CommentsListComponent } from './cmps/comments-list/comments-list.component';
 import { TimeDescPipe } from './pipes/time-desc.pipe';
+import { UserPortalComponent } from './cmps/user-portal/user-portal.component';
 
 @NgModule({
   declarations: [
@@ -17,6 +18,7 @@ import { TimeDescPipe } from './pipes/time-desc.pipe';
     CommentInputComponent,
     CommentsListComponent,
     TimeDescPipe,
+    UserPortalComponent,
   ],
   imports: [BrowserModule, FormsModule],
   providers: [],

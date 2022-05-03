@@ -12,15 +12,12 @@ import { Comment } from 'src/app/models/comment';
   templateUrl: './comments-list.component.html',
   styleUrls: ['./comments-list.component.scss'],
 })
-export class CommentsListComponent implements OnChanges {
+export class CommentsListComponent {
   @Input() comments: number[];
+  @Input() focusedCommentId: number | null;
   @Output() onCommentFocus = new EventEmitter<number>();
 
   commentsToList: Comment[];
 
   constructor() {}
-
-  ngOnChanges(changes) {
-    this.commentsToList = changes.comments.currentValue;
-  }
 }
