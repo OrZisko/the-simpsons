@@ -45,7 +45,6 @@ export class CommentsService {
     const newComment = {
       ...comment,
       createdAt: Date.now(),
-      ownerName: 'Bart Simpson',
       id: this._commantsDB.length + 1,
       children: [],
     };

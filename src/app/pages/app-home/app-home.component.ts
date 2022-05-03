@@ -46,6 +46,7 @@ export class AppHomeComponent implements OnInit, OnDestroy {
     const comment = {
       parentCommentId: this.focusedCommentId,
       ownerId: this.currUser.id,
+      ownerName: this.currUser.displayName,
       txt: commentTxt,
       deletedAt: null,
     };
